@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Singapore Connected — Loading Prototype</title>
+    <link rel="stylesheet" href="prototype.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/scrollama@3"></script>
+  </head>
+  <body>
+    <main class="experience" id="experience">
+      <header class="topbar">
+        <div class="masthead">
+          <span class="masthead-name">THE STRAITS TIMES</span>
+          <span class="masthead-rule" aria-hidden="true"></span>
+          <span class="masthead-section">SPECIAL REPORT / SINGAPORE INTERNET HISTORY</span>
+        </div>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">
+          Sound: off
+        </button>
+      </header>
+
+      <section class="intro" aria-labelledby="pageTitle">
+        <p class="status-line"><span class="status-dot" aria-hidden="true"></span><span id="statusText">Connection timed out</span></p>
+        <h1 id="pageTitle" aria-label="The internet used to make you wait.">
+          <span class="title-word">The</span>
+          <span class="title-word">internet</span>
+          <span class="title-word">used</span>
+          <span class="title-word">to</span>
+          <span class="title-word">make</span>
+          <span class="title-word">you</span>
+          <span class="title-word title-word-accent">wait.</span>
+        </h1>
+        <p class="intro-copy">
+          You have requested one photograph from Singapore. It is only 64 KB.
+          Choose a connection and find out how long the past would have kept you waiting.
+        </p>
+        <div class="request-console">
+          <div class="console-line"><span>&gt;</span> GET /singapore.jpg</div>
+          <div class="console-line"><span>&gt;</span> PAYLOAD 64 KB</div>
+          <div class="console-line console-muted" id="consoleStatus"><span>&gt;</span> AWAITING CONNECTION<span class="cursor" aria-hidden="true">_</span></div>
+          <button class="request-button" id="requestButton" type="button">Request the image <span>↗</span></button>
+          <button class="skip-button" id="skipButton" type="button">Skip the wait</button>
+        </div>
+      </section>
+
+      <section class="loader-stage" aria-label="Internet loading simulation">
+        <div class="photo-frame">
+          <div class="photo-placeholder" aria-hidden="true">NO SIGNAL</div>
+          <img
+            id="scene"
+            class="scene"
+            src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=65"
+            alt="Singapore skyline with Marina Bay Sands and the city skyline"
+          >
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="load-mask" id="loadMask" aria-hidden="true"></div>
+          <div class="image-caption">Singapore / one photograph / <span id="imageSize">64 KB</span></div>
+        </div>
+
+        <aside class="telemetry" aria-live="polite">
+          <div class="window-bar">
+            <span>SG INTERNET / DOWNLOAD</span>
+            <span aria-hidden="true">— □ ×</span>
+          </div>
+          <div class="download-title" id="downloadTitle">Saving singapore.jpg...</div>
+          <div class="wait-hero"><strong id="heroTime">—</strong><span>seconds left</span></div>
+          <div class="telemetry-row"><span>Speed</span><strong id="speedReadout">—</strong></div>
+          <div class="telemetry-row"><span>Loaded</span><strong id="loadedReadout">0 KB / 64 KB</strong></div>
+          <div class="telemetry-row"><span>Time left</span><strong id="timeReadout">—</strong></div>
+          <div class="progress-track" role="progressbar" aria-label="Image loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <p class="reveal-message" id="revealMessage">Waiting for connection...</p>
+          <div class="comparison">
+            <div class="comparison-heading"><span>Connection trials</span><strong id="triedCount">0 of 4 tried</strong></div>
+            <div class="comparison-bars" id="comparisonBars"></div>
+            <div class="comparison-multipliers" id="comparisonMultipliers"></div>
+          </div>
+          <p class="telemetry-note" id="telemetryNote">64 KB payload. Theoretical maximum speeds.</p>
+        </aside>
+      </section>
+
+      <section class="connections" aria-labelledby="connectionsTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Choose an era</p>
+          <h2 id="connectionsTitle">Now try the connection you grew up with.</h2>
+        </div>
+        <div class="connection-grid" id="connectionGrid">
+          <button class="connection is-selected" type="button" data-era="dialup">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">1990s</span>
+            <strong>Dial-up</strong>
+            <span class="connection-wait">≈ 9.1 s</span>
+            <span class="connection-speed">56 kbps</span>
+            <span class="connection-tag">telephone line</span>
+          </button>
+          <button class="connection" type="button" data-era="adsl">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">2000s</span>
+            <strong>ADSL</strong>
+            <span class="connection-wait">≈ 0.3 s</span>
+            <span class="connection-speed">1.5 Mbps</span>
+            <span class="connection-tag">always-on connection</span>
+          </button>
+          <button class="connection" type="button" data-era="fibre">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">2010s</span>
+            <strong>Fibre</strong>
+            <span class="connection-wait">≈ 5 ms</span>
+            <span class="connection-speed">100 Mbps</span>
+            <span class="connection-tag">light through glass</span>
+          </button>
+          <button class="connection" type="button" data-era="5g">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">Today</span>
+            <strong>5G</strong>
+            <span class="connection-wait">≈ 1 ms</span>
+            <span class="connection-speed">1 Gbps</span>
+            <span class="connection-tag">low-latency mobile</span>
+          </button>
+        </div>
+        <p class="honesty-note">
+          <span aria-hidden="true">i</span>
+          Prototype timings use a 64 KB image payload and theoretical maximum speeds.
+          Actual connections were often slower.
+        </p>
+        <p class="next-prompt" id="nextPrompt">Same image. Four connections.<br><strong>Try every connection to compare the eras.</strong></p>
+      </section>
+
+      <footer class="footer-note">
+        <span>One photograph.</span>
+        <span id="footerMessage">No connection selected.</span>
+      </footer>
+
+      <section class="story-part room-part" id="storyPart" aria-labelledby="storyTitle" hidden>
+        <div class="room-intro">
+          <p class="story-kicker">PART TWO / ENTER THE CONNECTED HOME</p>
+          <h2 id="storyTitle">What did the internet interrupt?</h2>
+          <p>Before it lived in every pocket, getting online took over one room, one phone line and everyone’s attention.</p>
+          <button class="story-enter" id="enterStory" type="button">Enter the room <span aria-hidden="true">↗</span></button>
+        </div>
+
+        <div class="room-scene" id="firstConnection" aria-label="Interactive 1990s Singapore home office" hidden>
+          <div class="room-window">
+            <span>BLOCK 18 / SINGAPORE / 1994</span>
+            <span>FRIDAY / 11:47 PM</span>
+          </div>
+          <div class="room-wall-copy">A small room.<br>A slow connection.<br>A new world.</div>
+          <div class="desk">
+            <div class="desk-lamp" aria-hidden="true"></div>
+            <button class="room-object telephone-object" id="telephoneObject" type="button" aria-label="Inspect the telephone">
+              <span class="telephone-cord"></span>
+              <span class="telephone-body">☎<b id="phoneAlert">CALL</b></span>
+              <small>telephone line</small>
+            </button>
+            <button class="room-meter" id="meterObject" type="button" aria-label="Inspect the connection meter">
+              <span class="meter-face"><b id="meterCost">S$0.00</b><em id="meterMinutes">00:00 online</em></span>
+              <small>connection meter</small>
+            </button>
+            <button class="room-object modem-object" id="modemObject" type="button" aria-label="Inspect the modem">
+              <span class="modem-lights"><i></i><i></i><i></i></span>
+              <strong>56k</strong>
+              <small>modem</small>
+            </button>
+            <button class="room-object computer-object" id="computerObject" type="button" aria-label="Inspect the computer">
+              <span class="computer-screen">
+                <b id="computerStatus">OFFLINE</b>
+                <em class="crt-lines" id="computerPage">
+                  <span>WELCOME TO SINGAPORE</span>
+                  <span>CONNECTING TO SINGNET...</span>
+                  <span>THE WORLD IS A CLICK AWAY</span>
+                </em>
+              </span>
+              <span class="computer-base"></span>
+              <small>desktop computer</small>
+            </button>
+          </div>
+          <div class="room-story-card" id="roomStoryCard">
+            <p class="story-kicker" id="roomKicker">LOOK AROUND</p>
+            <h3 id="roomStoryTitle">The connection is not here yet.</h3>
+            <p id="roomStoryCopy">Three objects tell the story. Start with the telephone.</p>
+            <div class="room-progress"><span id="roomProgress"></span></div>
+            <div class="room-tracker" id="roomTracker">0 of 3 explored</div>
+            <div class="user-growth" id="userGrowth" hidden>
+              <div class="user-growth-number"><strong id="userCount">1,500</strong><span>SingNet users</span></div>
+              <div class="house-icons" id="houseIcons" aria-hidden="true"></div>
+              <p class="source-credit">Source: National Library Board, Infopedia</p>
+            </div>
+            <p class="next-chapter" id="nextChapter" hidden>Next: the connection leaves the room.</p>
+            <button class="follow-cable" id="followCable" type="button" hidden>Follow the cable <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="room-focus-controls" aria-label="Room navigation">
+            <button id="exitRoom" type="button">Exit room <span aria-hidden="true">×</span></button>
+            <button id="nextObject" type="button">Next object <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="cable-journey" id="cableJourney" hidden>
+            <svg viewBox="0 0 1200 700" role="img" aria-label="A cable travelling from a home through a neighbourhood exchange and out to the world">
+              <path class="cable-route" d="M92 516 C260 540 310 420 450 456 S620 570 744 420 S930 228 1128 176" />
+              <circle cx="92" cy="516" r="13" /><circle cx="744" cy="420" r="13" /><circle cx="1128" cy="176" r="13" />
+            </svg>
+            <div class="cable-label cable-home">YOUR HOME</div>
+            <div class="cable-label cable-exchange">THE EXCHANGE</div>
+            <div class="cable-label cable-world">THE WORLD</div>
+            <div class="cable-copy">
+              <p class="story-kicker">FINAL FRAME / FOLLOW THE CABLE</p>
+              <h3>The connection leaves the room.</h3>
+              <p>From one telephone line, the signal travels to an exchange, across the city and out into a much larger network.</p>
+              <button class="chapter-next" id="continueChapter3" type="button">Continue to Chapter 3 <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+          <div class="room-caption">An imagined Singapore home office, reconstructed from the technology of the period.</div>
+        </div>
+      </section>
+
+      <section class="story-chapter chapter-three" id="chapter3" hidden aria-labelledby="chapter3Title">
+        <div class="chapter-number">03</div>
+        <div class="chapter-heading">
+          <p class="story-kicker">THE NETWORK / 1994–1996</p>
+          <h2 id="chapter3Title">Watch the signal escape.</h2>
+          <p>Do not read the network as a diagram. Send the signal and watch one private connection become part of Singapore’s nervous system.</p>
+        </div>
+        <div class="network-map" id="networkMap">
+          <div class="network-node node-home" data-node="home"><i></i><span>home</span></div>
+          <div class="network-node node-exchange" data-node="exchange"><i></i><span>local exchange</span></div>
+          <div class="network-node node-backbone" data-node="backbone"><i></i><span>backbone</span></div>
+          <div class="network-node node-world" data-node="world"><i></i><span>the world</span></div>
+          <svg viewBox="0 0 900 440" aria-hidden="true">
+            <path d="M92 310 C220 290 240 180 360 218 S500 350 610 230 S720 130 820 94"></path>
+          </svg>
+          <span class="network-packet" id="networkPacket" aria-hidden="true"></span>
+        </div>
+        <div class="chapter-action">
+          <p class="chapter-status" id="networkStatus">The route is quiet. Start at home.</p>
+          <button class="chapter-button" id="sendSignal" type="button">Send one signal <span>↗</span></button>
+          <button class="chapter-button" id="continueChapter4" type="button" hidden>Open the web <span>→</span></button>
+        </div>
+      </section>
+
+      <section class="story-chapter chapter-four" id="chapter4" hidden aria-labelledby="chapter4Title">
+        <div class="chapter-number">04</div>
+        <div class="chapter-heading">
+          <p class="story-kicker">THE WEB / 1996–2009</p>
+          <h2 id="chapter4Title">The web became a room with no walls.</h2>
+          <p>Every new destination pulled more people online. Open the tabs and feel the private connection turn into a shared public life.</p>
+        </div>
+        <div class="web-grid" id="webGrid">
+          <button class="web-card" type="button" data-web="news"><span>01 / THE PAPER</span><strong>Morning headlines enter the home.</strong><i>1996 / READ</i></button>
+          <button class="web-card" type="button" data-web="search"><span>02 / SEARCH</span><strong>The answer is suddenly everywhere.</strong><i>1998 / ASK</i></button>
+          <button class="web-card" type="button" data-web="social"><span>03 / MESSENGER</span><strong>Someone else is online.</strong><i>2003 / PING</i></button>
+          <button class="web-card" type="button" data-web="video"><span>04 / VIDEO</span><strong>The page starts to move.</strong><i>2009 / WATCH</i></button>
+        </div>
+        <div class="crowd-meter">
+          <span>web destinations opened</span>
+          <strong id="webCount">0 / 4</strong>
+        </div>
+        <p class="chapter-status" id="webStatus">Choose a destination.</p>
+        <button class="chapter-button chapter-four-next" id="continueChapter5" type="button" hidden>Continue to Chapter 5 <span>→</span></button>
+      </section>
+
+      <section class="story-chapter chapter-five" id="chapter5" hidden aria-labelledby="chapter5Title">
+        <div class="chapter-number">05</div>
+        <div class="chapter-heading">
+          <p class="story-kicker">THE PRESENT / ALWAYS CONNECTED</p>
+          <h2 id="chapter5Title">You are inside the network.</h2>
+          <p>Singapore’s internet story ends where the old waiting disappears: inside the ordinary moments that now depend on a signal.</p>
+        </div>
+        <div class="always-grid" id="alwaysGrid">
+          <button type="button" class="always-card is-active" data-always="home"><b>HOME</b><span>Streaming, studying, working.</span></button>
+          <button type="button" class="always-card" data-always="street"><b>STREET</b><span>Signals move with you.</span></button>
+          <button type="button" class="always-card" data-always="city"><b>CITY</b><span>Infrastructure disappears into the landscape.</span></button>
+        </div>
+        <div class="chapter-five-outro">
+          <p class="story-kicker">THE STORY CONTINUES</p>
+          <h3 id="alwaysTitle">From one phone line to a city that never disconnects.</h3>
+          <p id="alwaysCopy">The miracle is no longer that a page arrives. It is that we notice when it does not.</p>
+          <p class="final-credit">A Singapore internet history / an interactive special report</p>
+        </div>
+      </section>
+    </main>
+    <script src="prototype.js"></script>
+  </body>
+</html>
