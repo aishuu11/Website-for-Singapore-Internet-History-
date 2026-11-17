@@ -1,12 +1,501 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=prototype.html">
-  <title>Singapore Internet History</title>
-</head>
-<body>
-  <p>Opening the Singapore Internet History story...</p>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An illustrated, interactive story about how Singapore connected to the internet and how online life changed.">
+    <title>Singapore Internet History — Singapore Connected</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/scrollama@3"></script>
+  </head>
+  <body>
+    <main class="experience" id="experience">
+      <header class="topbar">
+        <div class="masthead">
+          <span class="masthead-rule" aria-hidden="true"></span>
+          <span class="masthead-section">SINGAPORE INTERNET HISTORY</span>
+        </div>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">
+          Sound: off
+        </button>
+      </header>
+
+      <section class="intro" aria-labelledby="pageTitle">
+        <p class="status-line"><span class="status-dot" aria-hidden="true"></span><span id="statusText">Your photo is waiting</span></p>
+        <h1 id="pageTitle" aria-label="The internet used to make you wait.">
+          <span class="title-word">The</span>
+          <span class="title-word">internet</span>
+          <span class="title-word">used</span>
+          <span class="title-word">to</span>
+          <span class="title-word">make</span>
+          <span class="title-word">you</span>
+          <span class="title-word title-word-accent">wait.</span>
+        </h1>
+        <p class="intro-copy">
+          Click the button to see how long one photograph took to arrive
+          when the internet was still new.
+        </p>
+        <p class="section-instruction">Start here: Watch the photo arrive.</p>
+        <div class="request-console">
+          <div class="console-line"><span>&gt;</span> ONE PHOTO FROM SINGAPORE</div>
+          <div class="console-line"><span>&gt;</span> A LONG WAY TO GO</div>
+          <div class="console-line console-muted" id="consoleStatus"><span>&gt;</span> CLICK TO BEGIN<span class="cursor" aria-hidden="true">_</span></div>
+          <button class="request-button" id="requestButton" type="button">Watch the photo arrive <span aria-hidden="true">↗</span></button>
+          <button class="skip-button" id="skipButton" type="button">Skip the wait and show me the photo</button>
+        </div>
+      </section>
+
+      <section class="loader-stage" aria-label="Watch the photograph arrive">
+        <div class="photo-frame">
+          <div class="photo-placeholder" aria-hidden="true">NO SIGNAL</div>
+          <img
+            id="scene"
+            class="scene"
+            src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=65"
+            alt="Singapore skyline with Marina Bay Sands and the city skyline"
+          >
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="load-mask" id="loadMask" aria-hidden="true"></div>
+          <div class="image-caption">Singapore / one photograph / from the early web</div>
+        </div>
+
+        <aside class="telemetry" aria-live="polite">
+          <div class="window-bar">
+            <span>SG INTERNET / DOWNLOAD</span>
+            <span aria-hidden="true">— □ ×</span>
+          </div>
+          <div class="download-title" id="downloadTitle">Saving singapore.jpg...</div>
+          <div class="wait-hero"><strong id="heroTime">—</strong><span>seconds</span></div>
+          <div class="telemetry-row"><span>How fast</span><strong id="speedReadout">—</strong></div>
+          <div class="telemetry-row"><span>Photo received</span><strong id="loadedReadout">Not yet</strong></div>
+          <div class="telemetry-row"><span>Time left</span><strong id="timeReadout">—</strong></div>
+          <div class="progress-track" role="progressbar" aria-label="Image loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <p class="reveal-message" id="revealMessage">Your photo is waiting to be requested.</p>
+          <div class="comparison">
+            <div class="comparison-heading"><span>How long did it take?</span><strong id="triedCount">0 of 4 tested</strong></div>
+            <div class="comparison-bars" id="comparisonBars"></div>
+            <div class="comparison-multipliers" id="comparisonMultipliers"></div>
+          </div>
+          <p class="telemetry-note" id="telemetryNote">One photo. One long wait.</p>
+        </aside>
+      </section>
+
+      <section class="connections" aria-labelledby="connectionsTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Compare the years</p>
+          <h2 id="connectionsTitle">How quickly could a photo arrive?</h2>
+        </div>
+        <p class="section-instruction">Choose a connection below to watch the same photo load. Try all four to compare.</p>
+        <p class="simulation-note"><strong>SIMULATION EXAMPLES</strong> The speeds below are examples used to estimate this photo’s arrival time. Actual speeds varied between homes and plans.</p>
+        <div class="connection-grid" id="connectionGrid">
+          <button class="connection is-selected" type="button" data-era="dialup" aria-pressed="true">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">1990s</span>
+            <span class="connection-current">Current simulation</span>
+            <strong>Dial-up</strong>
+            <span class="connection-wait">about 9 seconds</span>
+            <span class="connection-speed">Example speed: 56 kbps</span>
+            <span class="connection-tag">the phone line was busy</span>
+            <span class="connection-action">CLICK TO TRY</span>
+          </button>
+          <button class="connection" type="button" data-era="adsl" aria-pressed="false">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">2000s</span>
+            <span class="connection-current">Current simulation</span>
+            <strong>ADSL</strong>
+            <span class="connection-wait">less than a second</span>
+            <span class="connection-speed">Example speed: 1.5 Mbps</span>
+            <span class="connection-tag">the waiting got shorter</span>
+            <span class="connection-action">CLICK TO TRY</span>
+          </button>
+          <button class="connection" type="button" data-era="fibre" aria-pressed="false">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">2010s</span>
+            <span class="connection-current">Current simulation</span>
+            <strong>Fibre</strong>
+            <span class="connection-wait">almost instantly</span>
+            <span class="connection-speed">Example speed: 100 Mbps</span>
+            <span class="connection-tag">the picture arrived quickly</span>
+            <span class="connection-action">CLICK TO TRY</span>
+          </button>
+          <button class="connection" type="button" data-era="5g" aria-pressed="false">
+            <span class="connection-glyph" aria-hidden="true"></span>
+            <span class="connection-year">Today</span>
+            <span class="connection-current">Current simulation</span>
+            <strong>5G</strong>
+            <span class="connection-wait">instantly</span>
+            <span class="connection-speed">Example speed: 1 Gbps</span>
+            <span class="connection-tag">almost no waiting</span>
+            <span class="connection-action">CLICK TO TRY</span>
+          </button>
+        </div>
+        <p class="next-prompt" id="nextPrompt" aria-hidden="true"></p>
+        <p class="fact-label">In this simulation, the photo arrives faster with each example connection.</p>
+        <p class="chapter-handoff">After all four, enter the home where the connection began.</p>
+        <button class="story-enter enter-home-button" id="enterHomeButton" type="button" hidden>Enter the 1994 home <span aria-hidden="true">↗</span></button>
+      </section>
+
+      <footer class="footer-note">
+        <span>One photograph.</span>
+        <span id="footerMessage">No connection selected.</span>
+      </footer>
+
+      <section class="story-part room-part is-visible" id="storyPart" aria-labelledby="storyTitle">
+        <div class="room-intro">
+          <h2 id="storyTitle">What did the internet interrupt?</h2>
+          <p>In 1994, going online was a household event. It took over one room, one phone line and everyone's attention.</p>
+          <p class="section-instruction">Step inside, then select the phone, modem or computer to explore how dial-up changed life at home.</p>
+          <p class="fact-label">Notice what each object did: the phone was shared, the modem made the connection, and the computer opened a new world.</p>
+          <figure class="doorway-art">
+            <img class="preview-image" src="room-preview.png" alt="1994 Singapore home study with a landline phone, modem and CRT computer">
+            <figcaption class="preview-caption">Illustration of a Singapore home set-up in 1994</figcaption>
+            <div class="preview-window"></div>
+            <div class="preview-desk"><i class="preview-phone"></i><i class="preview-modem"></i><i class="preview-monitor"></i></div>
+          </figure>
+          <button class="story-enter preview-enter" id="doorwayTrigger" type="button">Explore the room <span aria-hidden="true">→</span></button>
+        </div>
+
+        <div class="room-scene" id="firstConnection" aria-label="Interactive 1990s Singapore home office" hidden>
+          <div class="room-window">
+            <span>BLOCK 18: SINGAPORE: 1994</span>
+            <span id="roomTrackerTop">0 OF 3 OBJECTS EXPLORED</span>
+            <button id="exitRoom" type="button">EXIT ROOM <span aria-hidden="true">×</span></button>
+          </div>
+            <div class="room-window-art" aria-hidden="true"></div>
+            <div class="room-wall-clock" aria-hidden="true"><i></i></div>
+          <div class="desk">
+            <div class="desk-lamp" aria-hidden="true"></div>
+            <button class="room-object telephone-object" id="telephoneObject" type="button" aria-label="Inspect the telephone">
+              <span class="telephone-cord"></span>
+              <span class="telephone-body">☎<b id="phoneAlert">CALL</b></span>
+              <small>PHONE</small>
+            </button>
+            <button class="room-meter" id="meterObject" type="button" aria-label="Inspect the simulated connection meter">
+              <span class="meter-face"><b id="meterCost">S$0.00</b><em id="meterMinutes">00:00 simulated</em></span>
+              <small>SIMULATION / CONNECTION METER</small>
+            </button>
+            <button class="room-object modem-object" id="modemObject" type="button" aria-label="Inspect the modem">
+              <span class="modem-lights"><i></i><i></i><i></i></span>
+              <strong>56k</strong>
+              <small>MODEM</small>
+            </button>
+            <button class="room-object computer-object" id="computerObject" type="button" aria-label="Inspect the computer">
+              <span class="computer-screen">
+                <b id="computerStatus">OFFLINE</b>
+                <em class="crt-lines" id="computerPage">
+                  <span>WELCOME TO SINGAPORE</span>
+                  <span>CONNECTING TO SINGNET...</span>
+                  <span>THE WORLD IS A CLICK AWAY</span>
+                </em>
+              </span>
+              <span class="computer-base"></span>
+              <small>COMPUTER</small>
+            </button>
+          </div>
+          <div class="room-prompt" aria-hidden="true">
+            <span id="roomPromptTyped"></span>
+          </div>
+          <span class="room-prompt-accessible" role="status" aria-atomic="true">Select the phone, modem or computer to explore its story.</span>
+          <div class="room-story-card" id="roomStoryCard">
+            <p class="story-kicker" id="roomKicker">LOOK AROUND</p>
+            <h3 id="roomStoryTitle">The connection is not here yet.</h3>
+            <p id="roomStoryCopy">Three objects tell the story. Start with the telephone.</p>
+            <div class="room-progress"><span id="roomProgress"></span></div>
+            <div class="room-tracker" id="roomTracker">0 of 3 explored</div>
+            <div class="user-growth" id="userGrowth" hidden>
+              <div class="user-growth-number"><strong id="userCount">≈100,000</strong><span>SingNet users by mid-1996</span></div>
+              <div class="house-icons" id="houseIcons" aria-hidden="true"></div>
+              <p class="source-credit">Source: National Library Board, Infopedia</p>
+            </div>
+            <p class="next-chapter" id="nextChapter" hidden>Next: the connection leaves the room.</p>
+            <button class="fact-next" id="nextObject" type="button">NEXT OBJECT <span aria-hidden="true">→</span></button>
+            <button class="fact-back" id="backToRoom" type="button">← BACK TO ROOM</button>
+            <button class="follow-cable" id="followCable" type="button" hidden>Follow the cable <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="cable-journey" id="cableJourney" hidden aria-labelledby="connectionTitle">
+            <button class="connection-back" id="backToRoomFromCable" type="button">← Back to room</button>
+            <div class="connection-scrolly" id="connectionScroll" role="region" aria-label="How a 1994 home connection reached the wider world" tabindex="0">
+              <header class="connection-heading">
+                <p class="story-kicker">SINGAPORE / 1994</p>
+                <h3 id="connectionTitle">From one home to the wider world.</h3>
+                <p>Follow one household connection from the phone line towards the wider world.</p>
+                <p class="connection-scroll-cue">Scroll or swipe to follow. On a keyboard, Tab through each stage.</p>
+              </header>
+
+              <figure class="connection-visual" id="connectionVisual" data-stage="home" aria-label="Conceptual illustration of a home connection reaching Singapore's local network and an international undersea cable. Not to scale or a mapped route.">
+                <svg viewBox="0 0 760 620" aria-hidden="true" focusable="false">
+                  <defs>
+                    <linearGradient id="connectionSea" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#b9d1d2"></stop>
+                      <stop offset="1" stop-color="#dce8e4"></stop>
+                    </linearGradient>
+                    <pattern id="connectionPaper" width="32" height="32" patternUnits="userSpaceOnUse">
+                      <path d="M32 0H0V32" fill="none" stroke="#122541" stroke-opacity=".045" stroke-width="1"></path>
+                    </pattern>
+                  </defs>
+                  <rect width="760" height="620" fill="#f5f3ee"></rect>
+                  <rect width="760" height="620" fill="url(#connectionPaper)"></rect>
+                  <path d="M0 390 C125 374 225 404 340 387 C445 372 510 405 590 390 C656 378 709 384 760 372 V620 H0Z" fill="url(#connectionSea)"></path>
+                  <path d="M0 492 C155 466 292 511 418 484 C554 454 642 500 760 472 V620 H0Z" fill="#c6b59d"></path>
+                  <path d="M0 390 C125 374 225 404 340 387 C445 372 510 405 590 390 C656 378 709 384 760 372" fill="none" stroke="#122541" stroke-opacity=".2" stroke-width="2"></path>
+                  <path d="M0 426 C110 412 205 444 316 426 M437 426 C543 408 644 444 760 418" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"></path>
+                  <path d="M145 286 C224 286 263 305 337 305" fill="none" stroke="#122541" stroke-opacity=".22" stroke-width="8" stroke-linecap="round"></path>
+                  <path d="M145 286 C224 286 263 305 337 305" class="connection-route connection-route-home" fill="none" stroke="#9f3048" stroke-width="4" stroke-linecap="round"></path>
+                  <path d="M405 305 C477 305 480 380 548 420 C599 450 654 450 724 450" fill="none" stroke="#122541" stroke-opacity=".22" stroke-width="8" stroke-linecap="round"></path>
+                  <path d="M405 305 C477 305 480 380 548 420 C599 450 654 450 724 450" class="connection-route connection-route-international" fill="none" stroke="#9f3048" stroke-width="4" stroke-linecap="round"></path>
+                  <path d="M548 420 C599 450 654 450 724 450" fill="none" stroke="#122541" stroke-width="14" stroke-linecap="round"></path>
+                  <path d="M548 420 C599 450 654 450 724 450" fill="none" stroke="#9f3048" stroke-width="3" stroke-linecap="round"></path>
+
+                  <g class="connection-node connection-node-home">
+                    <circle class="connection-node-halo" cx="118" cy="286" r="44"></circle>
+                    <path d="M73 267 L118 230 L163 267 V346 H73Z" fill="#e2c29e" stroke="#122541" stroke-width="3"></path>
+                    <path d="M103 346 V298 H133 V346 M86 278 H104 V294 H86Z M132 278 H150 V294 H132Z" fill="#f5f3ee" stroke="#122541" stroke-width="2"></path>
+                    <rect x="95" y="350" width="48" height="24" rx="12" fill="#122541"></rect>
+                    <text x="119" y="366" fill="#f5f3ee" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle">HOME</text>
+                  </g>
+
+                  <g class="connection-node connection-node-local">
+                    <circle class="connection-node-halo" cx="370" cy="305" r="54"></circle>
+                    <path d="M370 275 V305 M370 305 L338 331 M370 305 L402 331 M338 331 L322 353 M338 331 L354 353 M402 331 L386 353 M402 331 L418 353" fill="none" stroke="#122541" stroke-width="3" stroke-linecap="round"></path>
+                    <circle cx="370" cy="271" r="11" fill="#b6d59d" stroke="#122541" stroke-width="3"></circle>
+                    <circle cx="370" cy="305" r="10" fill="#e2c29e" stroke="#122541" stroke-width="3"></circle>
+                    <circle cx="338" cy="331" r="8" fill="#f5f3ee" stroke="#122541" stroke-width="3"></circle>
+                    <circle cx="402" cy="331" r="8" fill="#f5f3ee" stroke="#122541" stroke-width="3"></circle>
+                    <circle cx="322" cy="353" r="6" fill="#9f3048"></circle>
+                    <circle cx="354" cy="353" r="6" fill="#9f3048"></circle>
+                    <circle cx="386" cy="353" r="6" fill="#9f3048"></circle>
+                    <circle cx="418" cy="353" r="6" fill="#9f3048"></circle>
+                    <rect x="297" y="359" width="146" height="39" rx="19" fill="#122541"></rect>
+                    <text x="370" y="375" fill="#f5f3ee" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle">SINGAPORE</text>
+                    <text x="370" y="389" fill="#f5f3ee" font-family="Arial, sans-serif" font-size="12" letter-spacing="1" text-anchor="middle">LOCAL NETWORK</text>
+                  </g>
+
+                  <g class="connection-node connection-node-international">
+                    <circle class="connection-node-halo" cx="635" cy="450" r="48"></circle>
+                    <circle cx="635" cy="450" r="21" fill="#f5f3ee" stroke="#122541" stroke-width="7"></circle>
+                    <circle cx="635" cy="450" r="8" fill="#9f3048"></circle>
+                    <text x="635" y="410" fill="#122541" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle">INTERNATIONAL CABLE</text>
+                    <text x="635" y="424" fill="#122541" font-family="Arial, sans-serif" font-size="12" letter-spacing="1" text-anchor="middle">UNDER THE SEA</text>
+                  </g>
+                  <text x="42" y="52" fill="#69717a" font-family="Arial, sans-serif" font-size="13" letter-spacing="2">A CONNECTION, SEEN IN THREE STAGES</text>
+                </svg>
+                <figcaption class="connection-visual-caption" aria-live="polite" aria-atomic="true">
+                  <span id="connectionStageIndex">01 / 03</span>
+                  <strong id="connectionStageLabel">From the home</strong>
+                  <span>Illustration · not to scale</span>
+                </figcaption>
+              </figure>
+
+              <div class="connection-steps">
+                <article class="connection-step is-active" data-connection-step="home" tabindex="0" aria-labelledby="connectionHomeTitle">
+                  <p class="connection-step-index">01 / START AT HOME</p>
+                  <h4 id="connectionHomeTitle">A household goes online.</h4>
+                  <p>In 1994, a home computer used a dial-up modem and the phone line to connect.</p>
+                </article>
+                <article class="connection-step" data-connection-step="local" tabindex="0" aria-labelledby="connectionLocalTitle">
+                  <p class="connection-step-index">02 / SINGAPORE</p>
+                  <h4 id="connectionLocalTitle">The connection joins a local network.</h4>
+                  <p>From the home, it reaches Singapore’s local network. That carries the connection beyond one household.</p>
+                </article>
+                <article class="connection-step" data-connection-step="international" tabindex="0" aria-labelledby="connectionInternationalTitle">
+                  <p class="connection-step-index">03 / BEYOND SINGAPORE</p>
+                  <h4 id="connectionInternationalTitle">Undersea cables link networks across countries.</h4>
+                  <p>This is the broad next step towards the wider world—not a specific cable route or landing point.</p>
+                </article>
+              </div>
+
+              <footer class="connection-footer">
+                <p>Context: National Library Board, Infopedia (SingNet). The connection path is illustrative, not a documented route.</p>
+                <button class="connection-next" id="continueChapter3" type="button" hidden>Continue to the next chapter <span aria-hidden="true">→</span></button>
+              </footer>
+            </div>
+          </div>
+          <div class="room-caption">Illustration of a Singapore home set-up in 1994.</div>
+        </div>
+      </section>
+
+      <section class="story-chapter chapter-three" id="chapter3" aria-labelledby="chapter3Title">
+        <div class="broadband-adoption">
+          <div class="adoption-intro">
+            <p class="broadband-kicker">THEN IT SPREAD</p>
+            <h2 id="chapter3Title">The internet became part of the day.</h2>
+            <p>By mid-1996, SingNet had around 100,000 users. The project also identifies households, schools, businesses and government as settings where internet use spread, but does not provide comparable adoption counts for each.</p>
+          </div>
+          <aside class="adoption-highlight" aria-label="Around 100,000 SingNet users by mid-1996, source: National Library Board Infopedia">
+            <p>ONE EARLY MEASURE</p>
+            <strong>≈100,000</strong>
+            <span>SingNet users by mid-1996</span>
+            <small>Source: National Library Board, Infopedia.</small>
+          </aside>
+          <p class="adoption-takeaway">It changed ordinary places.</p>
+          <div class="adoption-context">
+            <p><strong>Getting online had a cost.</strong> The project notes that early SingNet plans charged by the minute on top of phone-call rates. Its moving counter is an illustration, not a documented tariff.</p>
+            <p class="adoption-context-source">Context: National Library Board, Infopedia (SingNet). No specific plan price is shown.</p>
+          </div>
+          <div class="adoption-visual" role="group" aria-label="Four areas named in the existing story; comparable adoption figures are not sourced">
+            <article class="adoption-place">
+              <span class="adoption-index">01</span>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="m6 22 18-15 18 15v20H6Z"/><path d="M19 42V27h10v15M11 22h26"/></svg>
+              <div><h4>Households</h4><p>At home</p></div>
+            </article>
+            <article class="adoption-place">
+              <span class="adoption-index">02</span>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 42V14h34v28M4 14 24 6l20 8M18 42V28h12v14M13 21h5m5 0h5m5 0h5"/></svg>
+              <div><h4>Schools</h4><p>In education</p></div>
+            </article>
+            <article class="adoption-place">
+              <span class="adoption-index">03</span>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 42V10h34v32M3 42h42M14 17h5m10 0h5M14 24h5m10 0h5M14 31h5m10 0h5M21 42V35h6v7"/></svg>
+              <div><h4>Businesses</h4><p>At work</p></div>
+            </article>
+            <article class="adoption-place">
+              <span class="adoption-index">04</span>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 18h38L24 7 5 18Zm4 20h30M7 42h34M12 20v16m8-16v16m8-16v16m8-16v16"/></svg>
+              <div><h4>Government</h4><p>Public services</p></div>
+            </article>
+          </div>
+          <p class="adoption-source-note">The early SingNet user count is a single measure. The project does not supply a matching year, population and measure for separate household, school, business or government adoption figures, so none are invented here.</p>
+          <div class="broadband-handoff">
+            <p>From a connection at home to a connection on the move.</p>
+            <a class="chapter-button" href="#chapter4">Follow the connection on the move <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="story-chapter chapter-four" id="chapter4" aria-labelledby="chapter4Title">
+        <header class="pocket-header">
+          <div class="pocket-masthead">
+            <span>SINGAPORE CONNECTED / CHAPTER 04</span>
+            <span>MOBILE INTERNET · 2005—2015</span>
+          </div>
+          <div class="pocket-heading">
+            <p class="pocket-kicker">A DAY IN YOUR POCKET</p>
+            <h2 id="chapter4Title">The internet left the house.</h2>
+            <p>Follow one ordinary journey as the phone changes what you can do at each stop.</p>
+            <span class="pocket-scroll-cue">SCROLL THROUGH THE DAY <span aria-hidden="true">↓</span></span>
+          </div>
+        </header>
+
+        <div class="pocket-journey">
+          <figure class="commute-stage" id="pocketVisual" data-stop="news" aria-labelledby="commuteCaption">
+            <div class="commute-stage-art">
+              <p class="commute-stage-label">A MORNING COMMUTE / SINGAPORE</p>
+            <svg class="commute-illustration" viewBox="0 0 1000 480" role="img" aria-labelledby="commuteTitle commuteDescription" preserveAspectRatio="xMidYMid slice">
+              <title id="commuteTitle">An illustrated journey from home to a bus stop and an MRT platform</title>
+              <desc id="commuteDescription">A red route line connects a home doorway, a generic bus stop and an MRT platform. A traveller moves through each scene as the story advances.</desc>
+              <rect width="1000" height="480" fill="#e9e5db"/>
+              <rect width="1000" height="325" fill="#e8e5dc"/>
+              <circle cx="805" cy="82" r="31" fill="#e8c58b"/>
+              <path d="M0 271 112 185l107 86 110-120 115 120 108-94 114 94 109-128 113 128 112-91v145H0Z" fill="#d5ded6"/>
+              <path d="M0 292 122 222l108 70 107-98 116 98 111-78 102 78 118-104 111 104 105-73v107H0Z" fill="#9db8ad"/>
+              <g class="commute-home">
+                <rect x="56" y="106" width="207" height="219" fill="#879b99"/>
+                <rect x="72" y="125" width="53" height="48" fill="#dce8df"/>
+                <rect x="146" y="125" width="53" height="48" fill="#dce8df"/>
+                <rect x="72" y="190" width="53" height="48" fill="#dce8df"/>
+                <rect x="146" y="190" width="53" height="48" fill="#dce8df"/>
+                <rect x="204" y="233" width="42" height="92" fill="#354a5b"/>
+                <path d="M198 233h54" stroke="#f4f1ea" stroke-width="5"/>
+                <text x="60" y="94" fill="#122541" font-size="12" font-family="monospace" letter-spacing="2">HOME</text>
+              </g>
+              <g class="commute-bus-stop">
+                <path d="M348 250h164l-18-27H366Z" fill="#122541"/>
+                <path d="M361 250v75m138-75v75" stroke="#122541" stroke-width="8"/>
+                <rect x="385" y="265" width="91" height="14" rx="7" fill="#b9c9bf"/>
+                <path d="M382 297h98" stroke="#122541" stroke-width="6"/>
+                <rect x="486" y="196" width="29" height="46" rx="3" fill="#f4f1ea" stroke="#122541" stroke-width="4"/>
+                <path d="M492 208h17m-17 8h17" stroke="#9f3048" stroke-width="3"/>
+                <text x="358" y="182" fill="#122541" font-size="12" font-family="monospace" letter-spacing="2">BUS STOP</text>
+              </g>
+              <g class="commute-platform">
+                <rect x="649" y="153" width="296" height="172" fill="#d4d8d1"/>
+                <path d="M650 153h295v22H650Z" fill="#122541"/>
+                <path d="M678 184v100m69-100v100m69-100v100m69-100v100" stroke="#f4f1ea" stroke-width="7"/>
+                <path d="M649 294h296" stroke="#9f3048" stroke-width="8"/>
+                <rect x="680" y="315" width="264" height="9" fill="#122541"/>
+                <text x="665" y="138" fill="#122541" font-size="12" font-family="monospace" letter-spacing="2">MRT PLATFORM</text>
+              </g>
+              <path d="M0 326h1000v154H0Z" fill="#d5c9b5"/>
+              <path d="M0 357h1000" stroke="#9f3048" stroke-width="6"/>
+              <path class="commute-route" pathLength="1" d="M228 357C330 345 382 369 482 357s154 0 250 0 149 0 268 0" fill="none" stroke="#9f3048" stroke-width="5" stroke-dasharray="1" stroke-dashoffset=".67"/>
+              <g fill="#f4f1ea" stroke="#9f3048" stroke-width="5">
+                <circle cx="229" cy="357" r="10"/><circle cx="481" cy="357" r="10"/><circle cx="819" cy="357" r="10"/>
+              </g>
+              <g class="traveller traveller-home" transform="translate(286 280)">
+                <circle cx="0" cy="0" r="16" fill="#b9654d"/><path d="M-16 20h32l15 72h-62Z" fill="#122541"/><path d="m-20 36-25 43m60-43 25 43M-11 91l-6 55m28-55 6 55" stroke="#b9654d" stroke-linecap="round" stroke-width="12"/><path d="M-22 146h16m23 0h16" stroke="#9f3048" stroke-linecap="round" stroke-width="9"/>
+              </g>
+              <g class="traveller traveller-bus" transform="translate(534 280)">
+                <circle cx="0" cy="0" r="16" fill="#b9654d"/><path d="M-16 20h32l15 72h-62Z" fill="#122541"/><path d="m-20 36-25 43m60-43 25 43M-11 91l-6 55m28-55 6 55" stroke="#b9654d" stroke-linecap="round" stroke-width="12"/><path d="M-22 146h16m23 0h16" stroke="#9f3048" stroke-linecap="round" stroke-width="9"/>
+              </g>
+              <g class="traveller traveller-train" transform="translate(860 280)">
+                <circle cx="0" cy="0" r="16" fill="#b9654d"/><path d="M-16 20h32l15 72h-62Z" fill="#122541"/><path d="m-20 36-25 43m60-43 25 43M-11 91l-6 55m28-55 6 55" stroke="#b9654d" stroke-linecap="round" stroke-width="12"/><path d="M-22 146h16m23 0h16" stroke="#9f3048" stroke-linecap="round" stroke-width="9"/>
+              </g>
+            </svg>
+            <div class="commute-phone" aria-hidden="true">
+              <div class="phone-earpiece"></div>
+              <div class="phone-screen">
+                <div class="phone-screen-news">
+                  <span class="phone-screen-bar">NEWS / MOBILE</span>
+                  <span class="phone-screen-section">NEWS</span>
+                  <span class="phone-screen-image"></span>
+                  <span class="phone-screen-lines"><i></i><i></i><i></i></span>
+                  <span class="phone-screen-tag">ILLUSTRATIVE</span>
+                </div>
+                <div class="phone-screen-map">
+                  <span class="phone-screen-bar">MAP / SCHEMATIC</span>
+                  <span class="phone-map-route"><i></i><i></i><i></i></span>
+                  <span class="phone-screen-lines"><i></i><i></i></span>
+                  <span class="phone-screen-tag">NO SERVICE SHOWN</span>
+                </div>
+                <div class="phone-screen-4g">
+                  <span class="phone-screen-bar">MOBILE NETWORK</span>
+                  <strong>4G</strong>
+                  <span class="phone-signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                  <span class="phone-screen-tag">COVERAGE MILESTONE</span>
+                </div>
+              </div>
+              <div class="phone-home-button"></div>
+            </div>
+            <div class="commute-stage-footer">
+              <span id="pocketStageStop" aria-live="polite">STOP 01 / NEWS · 2005</span>
+              <span id="pocketStagePrompt">NEXT STOP: FIND THE BUS ↓</span>
+            </div>
+            </div>
+            <figcaption id="commuteCaption">Illustration only; the phone screen is a generic reconstruction.</figcaption>
+          </figure>
+
+          <div class="pocket-story">
+            <article class="pocket-stop is-active" id="pocketStopNews" data-pocket-step="news" tabindex="0">
+              <div class="pocket-stop-copy">
+                <p class="pocket-stop-kicker">STOP 01 / 2005 · NEWS</p>
+                <h3>Headlines could travel with you.</h3>
+                <p>As you leave home, a small screen becomes a window to information on the way. The interface here is generic—not a made-up headline or a preserved news page.</p>
+              </div>
+            </article>
+            <article class="pocket-stop" id="pocketStopBus" data-pocket-step="bus" tabindex="0">
+              <div class="pocket-stop-copy">
+                <p class="pocket-stop-kicker">STOP 02 / 2010 · GETTING AROUND</p>
+                <h3>Now the phone helps you find the way.</h3>
+                <p>The story moves from reading on the go to using a phone while travelling. The illustrated map has no named bus, route, station or transport app.</p>
+              </div>
+            </article>
+            <article class="pocket-stop" id="pocketStopTrain" data-pocket-step="train" tabindex="0">
+              <div class="pocket-stop-copy">
+                <p class="pocket-stop-kicker">STOP 03 / 2015 · 4G ON THE MOVE</p>
+                <p class="pocket-stop-label">4G nationwide</p>
+                <h3>4G reaches nationwide coverage.</h3>
+                <p>IMDA records 4G services starting in 2012 and nationwide coverage in early 2015. That is a network milestone—not a promise of the same device, plan or signal for every traveller.</p>
+                <p class="pocket-stop-source">Source: <a href="https://www.imda.gov.sg/about-imda/research-and-statistics/4g-service-monitoring" target="_blank" rel="noopener noreferrer">IMDA, 4G Service Monitoring</a>.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+        <p class="pocket-source-note">The people, places, phone screens and route are illustrative, not documentary images. 2005 and 2010 are story moments, not service launch dates.</p>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
 </html>
