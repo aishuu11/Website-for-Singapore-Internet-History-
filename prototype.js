@@ -56,6 +56,8 @@
   var comparisonMultipliers = document.getElementById('comparisonMultipliers');
   var storyPart = document.getElementById('storyPart');
   var enterStory = document.getElementById('enterStory');
+  var enterHomeButton = document.getElementById('enterHomeButton');
+  var doorwayTrigger = document.getElementById('doorwayTrigger');
   var roomIntro = document.querySelector('.room-intro');
   var firstConnection = document.getElementById('firstConnection');
   var roomScene = document.querySelector('.room-scene');
@@ -71,20 +73,44 @@
   var houseIcons = document.getElementById('houseIcons');
   var nextChapter = document.getElementById('nextChapter');
   var roomTracker = document.getElementById('roomTracker');
+  var roomTrackerTop = document.getElementById('roomTrackerTop');
   var followCable = document.getElementById('followCable');
   var cableJourney = document.getElementById('cableJourney');
   var exitRoom = document.getElementById('exitRoom');
   var nextObject = document.getElementById('nextObject');
+  var backToRoom = document.getElementById('backToRoom');
   var continueChapter3 = document.getElementById('continueChapter3');
+  var executeTrace = document.getElementById('executeTrace');
+  var traceStatus = document.getElementById('traceStatus');
+  var traceBytes = document.getElementById('traceBytes');
+  var traceRows = document.querySelectorAll('.trace-row');
+  var traceNodes = document.querySelectorAll('.trace-node');
+  var traceTopology = document.querySelector('.trace-topology');
   var chapter3 = document.getElementById('chapter3');
   var sendSignal = document.getElementById('sendSignal');
-  var networkStatus = document.getElementById('networkStatus');
   var continueChapter4 = document.getElementById('continueChapter4');
+  var broadbandProgress = document.getElementById('broadbandProgress');
+  var broadbandSteps = document.querySelectorAll('.broadband-step');
+  var speedValue = document.getElementById('speedValue');
+  var speedUnit = document.getElementById('speedUnit');
+  var speedEra = document.getElementById('speedEra');
+  var speedCaption = document.getElementById('speedCaption');
+  var pillarTabs = document.querySelectorAll('.pillar-tab');
+  var pillarValue = document.getElementById('pillarValue');
+  var pillarLabel = document.getElementById('pillarLabel');
+  var pillarCaption = document.getElementById('pillarCaption');
+  var indexBars = document.querySelectorAll('.index-bar');
+  var indexResponse = document.getElementById('indexResponse');
   var chapter4 = document.getElementById('chapter4');
   var webCards = document.querySelectorAll('.web-card');
   var webCount = document.getElementById('webCount');
   var webStatus = document.getElementById('webStatus');
   var continueChapter5 = document.getElementById('continueChapter5');
+  var pocketSteps = document.querySelectorAll('.pocket-step');
+  var pocketYear = document.getElementById('pocketYear');
+  var pocketStory = document.getElementById('pocketStory');
+  var pocketSpeed = document.getElementById('pocketSpeed');
+  var pocketTickerProgress = document.getElementById('pocketTickerProgress');
   var chapter5 = document.getElementById('chapter5');
   var alwaysCards = document.querySelectorAll('.always-card');
   var alwaysTitle = document.getElementById('alwaysTitle');
@@ -306,10 +332,10 @@
     loadMask.style.transform = 'scaleY(' + (1 - progress) + ')';
     progressBar.style.transform = 'scaleX(' + progress + ')';
     progressTrack.setAttribute('aria-valuenow', Math.round(progress * 100));
-    loadedReadout.textContent = Math.round(imageSizeKb * progress) + ' KB / 64 KB';
+    loadedReadout.textContent = progress >= 1 ? 'Yes' : 'Not yet';
     timeReadout.textContent = progress >= 1 ? 'complete' : formatTime(remaining);
     heroTime.textContent = progress >= 1 ? '0.0' : Math.max(remaining, 0).toFixed(1);
-    statusText.textContent = progress >= 1 ? 'Image received' : 'Receiving image via ' + connection.label;
+    statusText.textContent = progress >= 1 ? 'Photo received' : 'Receiving the photo via ' + connection.label;
     statusDot.classList.toggle('is-loading', progress < 1);
     var activeButton = document.querySelector('.connection.is-selected');
     if (activeButton) activeButton.style.setProperty('--fill', (progress * 100) + '%');
@@ -326,18 +352,18 @@
     playTone(620, 0.2);
     footerMessage.textContent = connection.label + ' finished loading.';
     scene.classList.add('is-revealed');
-    revealMessage.textContent = 'You waited ' + formatResultTime(totalSeconds) + ' for one picture.';
+    revealMessage.textContent = 'That photograph took ' + formatResultTime(totalSeconds) + ' to arrive.';
     testedEras[selectedEra] = totalSeconds;
-    renderComparison();
-    if (storyPart.hidden) {
-      storyPart.hidden = false;
-      window.requestAnimationFrame(function () {
-        storyPart.classList.add('is-visible');
-      });
+    var testedButton = document.querySelector('.connection[data-era="' + selectedEra + '"]');
+    if (testedButton) {
+      testedButton.classList.add('is-tried');
+      testedButton.querySelector('.connection-action').textContent = 'TRIED';
     }
+    renderComparison();
     if (Object.keys(testedEras).length === Object.keys(connections).length) {
       nextPrompt.classList.add('is-visible');
-      footerMessage.textContent = 'All connections tested.';
+      enterHomeButton.hidden = false;
+      footerMessage.textContent = 'All connections tested — choose when to continue.';
     }
     experience.classList.add('show-controls');
   }
@@ -357,17 +383,17 @@
     });
 
     var totalSeconds = (imageSizeKb * 8) / connection.speedKbps;
-    requestButton.innerHTML = 'Request again <span aria-hidden="true">↗</span>';
-    speedReadout.textContent = connection.display;
+    requestButton.innerHTML = 'Request the photo again <span aria-hidden="true">↗</span>';
+    speedReadout.textContent = connection.label + ' connection';
     timeReadout.textContent = formatTime(totalSeconds);
     heroTime.textContent = totalSeconds.toFixed(1);
-    loadedReadout.textContent = '0 KB / 64 KB';
-    telemetryNote.textContent = '64 KB payload ÷ ' + connection.display + '. Theoretical maximum speed.';
-    footerMessage.textContent = connection.label + ' selected — watch the image arrive.';
+    loadedReadout.textContent = 'Not yet';
+    telemetryNote.textContent = 'Watch one photograph arrive using the ' + connection.label + ' connection.';
+    footerMessage.textContent = connection.label + ' selected — press the button to request the photo.';
     revealMessage.textContent = '';
     nextPrompt.classList.remove('is-visible');
     scene.classList.remove('is-revealed');
-    consoleStatus.innerHTML = '<span>&gt;</span> CONNECTING VIA ' + connection.label.toUpperCase() + '<span class="cursor" aria-hidden="true">_</span>';
+    consoleStatus.innerHTML = '<span>&gt;</span> THE PHOTO IS ARRIVING<span class="cursor" aria-hidden="true">_</span>';
     consoleStatus.classList.add('is-active');
     scene.classList.toggle('is-fast', totalSeconds < 0.2);
     loadMask.style.transition = 'none';
@@ -388,7 +414,7 @@
       if (progress < 1) {
         animationFrame = window.requestAnimationFrame(tick);
       } else {
-        consoleStatus.innerHTML = '<span>&gt;</span> IMAGE RECEIVED';
+        consoleStatus.innerHTML = '<span>&gt;</span> YOUR PHOTO HAS ARRIVED';
         consoleStatus.classList.remove('is-active');
         finishLoading(connection, totalSeconds);
       }
@@ -398,7 +424,7 @@
 
   document.getElementById('connectionGrid').addEventListener('click', function (event) {
     var button = event.target.closest('.connection');
-    if (button && hasStarted) startLoading(button.dataset.era);
+    if (button) startLoading(button.dataset.era);
   });
 
   requestButton.addEventListener('click', function () {
@@ -410,18 +436,38 @@
     window.cancelAnimationFrame(animationFrame);
     var connection = connections[selectedEra];
     renderProgress(1, connection, 0);
-    consoleStatus.innerHTML = '<span>&gt;</span> IMAGE RECEIVED';
+    consoleStatus.innerHTML = '<span>&gt;</span> YOUR PHOTO HAS ARRIVED';
     consoleStatus.classList.remove('is-active');
     finishLoading(connection, 0);
+  });
+
+  enterHomeButton.addEventListener('click', function () {
+    storyPart.hidden = false;
+    storyPart.classList.add('is-visible');
+    enterStory.click();
   });
 
   enterStory.addEventListener('click', function () {
     roomIntro.hidden = true;
     roomScene.hidden = false;
+    roomScene.classList.remove('room-opening');
+    window.requestAnimationFrame(function () { roomScene.classList.add('room-opening'); });
+    window.setTimeout(function () { roomScene.classList.remove('room-opening'); }, 950);
     roomScene.classList.add('room-awake');
     roomScene.dataset.frame = '0';
     startBillingMeter();
     firstConnection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  doorwayTrigger.addEventListener('click', function () {
+    enterStory.click();
+  });
+
+  doorwayTrigger.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      enterStory.click();
+    }
   });
 
   roomObjects.forEach(function (object) {
@@ -432,14 +478,17 @@
       roomScene.dataset.focus = objectId;
       exploredObjects[objectId] = true;
       roomTracker.textContent = Object.keys(exploredObjects).length + ' of 3 explored';
+      roomTrackerTop.textContent = Object.keys(exploredObjects).length + ' OF 3 OBJECTS EXPLORED';
       unlockCableJourney();
+      nextObject.textContent = 'NEXT OBJECT →';
+      nextObject.classList.remove('is-final');
       roomObjects.forEach(function (item) { item.classList.remove('is-inspected'); });
       object.classList.add('is-inspected');
       if (objectId === 'telephoneObject') {
         setRoomFrame(1);
-        roomKicker.textContent = 'TELEPHONE LINE / OCCUPIED';
-        roomStoryTitle.textContent = 'The line is yours.';
-        roomStoryCopy.textContent = '“Get off the computer, I need to use the phone!” The line is occupied by the internet, so an incoming call cuts the connection. In 1994, going online had a social cost.';
+        roomKicker.textContent = 'TELEPHONE LINE: OCCUPIED';
+        roomStoryTitle.textContent = 'One line for the whole family.';
+        roomStoryCopy.textContent = 'In 1994, one phone line served the whole family. When someone went online, nobody else could use the phone.';
         roomProgress.style.transform = 'scaleX(.28)';
         roomScene.classList.add('phone-occupied', 'phone-ringing', 'connection-cut');
         computerStatus.textContent = 'LINE INTERRUPTED';
@@ -448,9 +497,9 @@
       }
       if (objectId === 'modemObject') {
         setRoomFrame(2);
-        roomKicker.textContent = 'MODEM / LISTENING';
-        roomStoryTitle.textContent = 'Now let the modem sing.';
-        roomStoryCopy.textContent = 'The modem turns a telephone line into a data line. Its screech is a handshake: two machines negotiating how to speak at 56 kbps.';
+        roomKicker.textContent = 'THE MODEM IS CONNECTING';
+        roomStoryTitle.textContent = 'Every minute online cost money.';
+        roomStoryCopy.textContent = 'The modem connected the computer through the phone line. Its loud beeps meant the connection was being made, and time online was charged by the minute.';
         roomProgress.style.transform = 'scaleX(.62)';
         roomScene.classList.add('modem-active');
         roomScene.classList.remove('phone-ringing', 'connection-cut');
@@ -460,11 +509,13 @@
         return;
       }
       setRoomFrame(3);
-      roomKicker.textContent = 'FIRST PAGE / ARRIVING';
-      roomStoryTitle.textContent = 'The page is finally here.';
-      roomStoryCopy.textContent = 'The page does not appear all at once. It arrives in strips, slowly enough to watch a distant server become visible on a Singapore screen.';
+      roomKicker.textContent = 'THE FIRST PAGE';
+      roomStoryTitle.textContent = 'A slow window to the wider world.';
+      roomStoryCopy.textContent = 'A web page arrived bit by bit. You could watch the words and pictures slowly appear on the screen.';
       roomProgress.style.transform = 'scaleX(1)';
-      computerStatus.textContent = 'CONNECTED / 56 KBPS';
+      computerStatus.textContent = 'ONLINE';
+      nextObject.textContent = 'EXIT ROOM & CONTINUE ↓';
+      nextObject.classList.add('is-final');
       roomScene.classList.remove('phone-ringing', 'connection-cut');
       paintComputerPage();
       roomScene.classList.add('computer-online');
@@ -483,27 +534,77 @@
   });
 
   nextObject.addEventListener('click', function () {
+    if (roomScene.dataset.focus === 'computerObject') {
+      followCable.click();
+      return;
+    }
     var objectIds = ['telephoneObject', 'modemObject', 'computerObject'];
     var currentIndex = objectIds.indexOf(roomScene.dataset.focus);
     var nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % objectIds.length;
     document.getElementById(objectIds[nextIndex]).click();
   });
 
+  backToRoom.addEventListener('click', function () {
+    closeRoomFocus();
+    nextObject.textContent = 'NEXT OBJECT →';
+    nextObject.classList.remove('is-final');
+  });
+
   meterObject.addEventListener('click', function () {
+    zoomToObject(meterObject);
+    roomScene.classList.add('is-focused');
+    roomScene.dataset.focus = 'modemObject';
+    roomObjects.forEach(function (item) { item.classList.remove('is-inspected'); });
+    document.getElementById('modemObject').classList.add('is-inspected');
     meterObject.classList.toggle('is-inspected');
     startBillingMeter();
-    roomKicker.textContent = 'SINGNET / METER RUNNING';
-    roomStoryTitle.textContent = 'Every minute costs.';
-    roomStoryCopy.textContent = 'The longer the page takes, the more the household watches the bill climb. In this room, “just five more minutes” is not free.';
+    roomKicker.textContent = 'SINGNET: METER RUNNING';
+    roomStoryTitle.textContent = 'Every minute on the clock cost money.';
+    roomStoryCopy.textContent = 'Early SingNet plans charged by the minute on top of phone call rates, turning every slow webpage load into a race against the clock.';
     roomProgress.style.transform = 'scaleX(.46)';
   });
 
   followCable.addEventListener('click', function () {
     cableJourney.hidden = false;
     roomScene.classList.add('cable-mode');
-    cableJourney.classList.add('is-travelling');
-    roomTracker.textContent = '3 of 3 explored / signal followed';
-    continueChapter3.hidden = false;
+    cableJourney.classList.remove('is-travelling');
+    roomTracker.textContent = '3 of 3 explored: signal followed';
+    executeTrace.disabled = false;
+    continueChapter3.hidden = true;
+    traceStatus.textContent = 'The signal is waiting at home.';
+    traceBytes.textContent = '000000';
+    traceRows.forEach(function (row) { row.classList.remove('is-active', 'is-complete'); });
+    traceNodes.forEach(function (node) { node.classList.remove('is-active'); });
+    traceTopology.classList.remove('is-live');
+  });
+
+  executeTrace.addEventListener('click', function () {
+    executeTrace.disabled = true;
+    traceTopology.classList.add('is-live');
+    traceStatus.textContent = 'The signal is leaving home...';
+    var startedAt = performance.now();
+    var byteTimer = window.setInterval(function () {
+      var progress = Math.min((performance.now() - startedAt) / 3200, 1);
+      traceBytes.textContent = String(Math.round(64000 * progress)).padStart(6, '0');
+      if (progress >= 1) window.clearInterval(byteTimer);
+    }, 80);
+    [0, 1, 2].forEach(function (index) {
+      window.setTimeout(function () {
+        if (index > 0) traceRows[index - 1].classList.add('is-complete');
+        traceRows[index].classList.add('is-active');
+        traceNodes[index].classList.add('is-active');
+        traceStatus.textContent = [
+          'The signal is leaving home...',
+          'The signal is crossing Singapore...',
+          'The signal is reaching the wider world.'
+        ][index];
+      }, index * 1050);
+    });
+    window.setTimeout(function () {
+      traceRows[2].classList.add('is-complete');
+      traceStatus.textContent = 'The signal has reached the wider world.';
+      continueChapter3.hidden = false;
+    }, 3250);
   });
 
   continueChapter3.addEventListener('click', function () {
@@ -512,26 +613,67 @@
   });
 
   sendSignal.addEventListener('click', function () {
-    var nodes = document.querySelectorAll('.network-node');
     sendSignal.disabled = true;
-    document.getElementById('networkMap').classList.add('is-live');
-    networkStatus.textContent = 'Signal travelling from the home to the exchange...';
-    nodes[0].classList.add('is-reached');
+    var milestones = [
+      { value: '56', unit: 'kbps', era: 'DIAL-UP / 1994', caption: 'The line was something you waited beside.' },
+      { value: '1,500', unit: 'kbps', era: 'ADSL / 2000',       caption: 'The waiting started to disappear.' },
+      { value: '1', unit: 'Gbps', era: 'FIBRE / 2010',       caption: 'The internet became part of the day.' },
+      { value: '5G', unit: '', era: 'MOBILE BROADBAND / 2020',       caption: 'The connection followed people outside.' }
+    ];
+    milestones.forEach(function (milestone, index) {
+      window.setTimeout(function () {
+        speedValue.textContent = milestone.value;
+        speedUnit.textContent = milestone.unit;
+        speedEra.textContent = milestone.era;
+        speedCaption.textContent = milestone.caption;
+      }, index * 650);
+    });
     window.setTimeout(function () {
-      nodes[1].classList.add('is-reached');
-      networkStatus.textContent = 'The exchange routes it onto the national backbone...';
-    }, 850);
-    window.setTimeout(function () {
-      nodes[2].classList.add('is-reached');
-      networkStatus.textContent = 'One small room is now part of the world.';
-    }, 1700);
-    window.setTimeout(function () {
-      nodes[3].classList.add('is-reached');
-      continueChapter4.hidden = false;
       sendSignal.hidden = true;
-      networkStatus.textContent = 'Signal delivered. The audience is waiting.';
-    }, 2700);
+    }, 2200);
   });
+
+  pillarTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var pillarData = {
+        households: ['97.2%', 'homes connected', 'The connection moved from a room into everyday life.'],
+        education: ['95%', 'schools connected', 'The classroom assumes the signal is already there.'],
+        business: ['78%', 'businesses online', 'The storefront stays open after the shutters come down.'],
+        government: ['90%', 'services online', 'The queue moves from the counter to the screen.']
+      }[tab.dataset.pillar];
+      pillarTabs.forEach(function (item) { item.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      pillarValue.textContent = pillarData[0];
+      pillarLabel.textContent = pillarData[1];
+      pillarCaption.textContent = pillarData[2];
+    });
+  });
+
+  indexBars.forEach(function (bar) {
+    bar.addEventListener('click', function () {
+      indexBars.forEach(function (item) { item.classList.remove('is-active'); });
+      bar.classList.add('is-active');
+      indexResponse.textContent = {
+        home: 'The network is no longer a special destination.',
+        schools: 'The classroom now assumes the signal is already there.',
+        businesses: 'The storefront can stay open after the shutters come down.',
+        government: 'The queue moves from the counter to the screen.'
+      }[bar.dataset.index];
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    var broadbandObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        broadbandSteps.forEach(function (step) { step.classList.remove('is-active'); });
+        entry.target.classList.add('is-active');
+        var stageNumber = Array.prototype.indexOf.call(broadbandSteps, entry.target) + 1;
+        broadbandProgress.textContent = String(stageNumber).padStart(2, '0') + ' / 03 — ' + entry.target.dataset.broadbandStep.toUpperCase();
+      });
+    }, { threshold: .6 });
+    broadbandSteps.forEach(function (step) { broadbandObserver.observe(step); });
+  }
 
   continueChapter4.addEventListener('click', function () {
     chapter4.hidden = false;
@@ -543,11 +685,32 @@
       card.classList.add('is-open');
       chapter4.dataset.webFocus = card.dataset.web;
       var opened = document.querySelectorAll('.web-card.is-open').length;
-      webCount.textContent = opened + ' / 4';
-      webStatus.textContent = opened === 4 ? 'The web is no longer empty. Continue to Chapter 5.' : opened + ' destination' + (opened === 1 ? '' : 's') + ' opened.';
-      if (opened === 4) continueChapter5.hidden = false;
+      webCount.textContent = opened + ' / 3 opened';
+      webStatus.textContent = opened === 3 ? 'The phone now travels with you. Continue to Chapter 5.' : opened + ' moment opened.';
+      if (opened === 3) continueChapter5.hidden = false;
     });
   });
+
+  if ('IntersectionObserver' in window) {
+    var pocketObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        pocketSteps.forEach(function (step) { step.classList.remove('is-active'); });
+        entry.target.classList.add('is-active');
+        var pocketStep = entry.target.dataset.pocketStep;
+        var pocketState = {
+          '3g': { year: '2005', label: 'THE PHONE GOES WITH YOU', progress: '.15', story: 'The phone was no longer only for calls. Slowly, it became a small window to the world you carried through Singapore.' },
+          '4g': { year: '2010', label: 'THE PHONE BECOMES USEFUL', progress: '.55', story: 'The internet started helping with ordinary decisions: which bus to take, where to go, and when to leave.' },
+          always: { year: '2015', label: 'THE PHONE KEEPS YOU CONNECTED', progress: '.95', story: 'Music, video, work, and friends travelled with you. The internet had left the house.' }
+        }[pocketStep];
+        pocketYear.textContent = pocketState.year;
+        pocketSpeed.textContent = pocketState.label;
+        pocketTickerProgress.style.transform = 'scaleX(' + pocketState.progress + ')';
+        pocketStory.textContent = pocketState.story;
+      });
+    }, { threshold: .6 });
+    pocketSteps.forEach(function (step) { pocketObserver.observe(step); });
+  }
 
   continueChapter5.addEventListener('click', function () {
     chapter5.hidden = false;
@@ -556,16 +719,16 @@
 
   var alwaysStories = {
     home: {
-      title: 'From one phone line to a city that never disconnects.',
-      copy: 'The miracle is no longer that a page arrives. It is that we notice when it does not.'
+      title: 'From waiting for a page to living inside the connection.',
+      copy: 'In 1994, getting online was an event. Today, the remarkable thing is how ordinary it feels.'
     },
     street: {
-      title: 'The connection learned to move.',
-      copy: 'What began beside a telephone became something carried in a pocket, through a neighbourhood and across the island.'
+      title: 'The connection comes with us.',
+      copy: 'We use it to find a route, meet someone, pay for something, or check what is happening next.'
     },
     city: {
-      title: 'The network became part of the landscape.',
-      copy: 'The cables, exchanges and signals are mostly invisible now. Their presence is felt in everything that depends on being online.'
+      title: 'The invisible thing became essential.',
+      copy: 'The network is hidden in the walls and in the air, but our days quietly depend on it.'
     }
   };
 
@@ -594,9 +757,6 @@
     telemetryNote.textContent = 'The simulation still works, but the prototype image could not be loaded.';
   });
 
-  connectionButtons.forEach(function (button) {
-    button.disabled = true;
-  });
   renderConnectionWaits();
 
   if (window.scrollama) {
